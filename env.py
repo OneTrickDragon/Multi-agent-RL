@@ -1,40 +1,35 @@
-from dataclasses import dataclass, field
-import numpy as np
+"""
+env.py — Convenience re-exports for the simulation environment.
 
-@dataclass
-class WorldConfig:
-    width: int
-    height: int
-    initial_population: int
-    observation_radius: int
-    resource_regen_rate: float
-    max_resource_per_cell: float
-    starting_food: int
-    food_drain_per_tick: int
+All core types are defined in their respective modules:
+    config.py      → WorldConfig
+    agent.py       → Agent, AgentClass, ClassTraits, CLASS_TRAITS
+    terrain.py     → TerrainType, generate_terrain, seed_resources
+    actions.py     → Action, MOVE_DELTAS, CLASS_ACTIONS
+    world.py       → World
+    observations.py → build_observation
+    rewards.py     → compute_reward
+    policies.py    → Policy, PolicyPool
+    renderer.py    → Renderer
+    analytics.py   → plot_metrics, plot_policy_fitness
+"""
 
+from config import WorldConfig
+from agent import Agent, AgentClass, ClassTraits, CLASS_TRAITS
+from terrain import TerrainType, generate_terrain, seed_resources
+from actions import Action, MOVE_DELTAS, CLASS_ACTIONS
+from world import World
+from observations import build_observation
+from rewards import compute_reward
+from policies import Policy, PolicyPool
 
-@dataclass
-class Agent:
-    id: int
-    x: int
-    y: int
-    cls: AgentClass   
-    health: float
-    food: float
-    age: int
-    policy_id: int
-
-
-class World:
-    def __init__(self, config: WorldConfig):
-        self.terrain = np.zeros((config.width, config.height))   # terrain types
-        self.food    = np.zeros((config.width, config.height))   # food per cell
-        self.materials = np.zeros((config.width, config.height)) # materials per cell
-        
-    def reset(self): ...
-    def step(self): ...
-    def get_observation(self, agent: Agent): ...
-    def _resolve_actions(self, actions: dict): ...
-    def _update_resources(self): ...
-    def _update_agents(self): ...
-    def render(self): ...
+__all__ = [
+    "WorldConfig",
+    "Agent", "AgentClass", "ClassTraits", "CLASS_TRAITS",
+    "TerrainType", "generate_terrain", "seed_resources",
+    "Action", "MOVE_DELTAS", "CLASS_ACTIONS",
+    "World",
+    "build_observation",
+    "compute_reward",
+    "Policy", "PolicyPool",
+]
