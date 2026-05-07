@@ -9,9 +9,10 @@ All core types are defined in their respective modules:
     world.py       → World
     observations.py → build_observation
     rewards.py     → compute_reward
-    policies.py    → Policy, PolicyPool
-    renderer.py    → Renderer
-    analytics.py   → plot_metrics, plot_policy_fitness
+    policies.py         → Policy, PolicyPool
+    policy_networks.py  → NeuralNetPolicy, TabularPolicy, RuleBasedPolicy
+    renderer.py         → Renderer
+    analytics.py        → plot_metrics, plot_policy_fitness
 """
 
 from config import WorldConfig
@@ -22,6 +23,7 @@ from world import World
 from observations import build_observation
 from rewards import compute_reward
 from policies import Policy, PolicyPool
+from policy_networks import NeuralNetPolicy, TabularPolicy, RuleBasedPolicy
 
 __all__ = [
     "WorldConfig",
@@ -32,4 +34,5 @@ __all__ = [
     "build_observation",
     "compute_reward",
     "Policy", "PolicyPool",
+    "NeuralNetPolicy", "TabularPolicy", "RuleBasedPolicy",
 ]
