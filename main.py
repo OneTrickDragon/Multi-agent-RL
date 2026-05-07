@@ -30,6 +30,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--height", type=int, default=None, help="Grid height")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--pool-size", type=int, default=10, help="Policy pool size")
+    parser.add_argument("--policy", type=str, default="neural",
+                        choices=["neural", "tabular", "rule_based"],
+                        help="Policy representation type")
     parser.add_argument("--log-interval", type=int, default=100, help="Console log every N steps")
     return parser.parse_args()
 
@@ -53,7 +56,11 @@ def main() -> None:
 
     # ── Initialize ────────────────────────────────────────────────────
     world = World(config)
-    pool = PolicyPool(size=args.pool_size)
+    pool = PolicyPool(
+        size=args.pool_size,
+        kind=args.policy,
+        observation_radius=config.observation_radius,
+    )
 
     # Assign random policies to all agents after reset
     obs = world.reset()
@@ -70,6 +77,7 @@ def main() -> None:
 
     print(f"[Simulation] Starting — {config.width}x{config.height} grid, "
           f"{config.initial_population} agents, {config.max_steps} max steps")
+    print(f"[Simulation] Policy: {args.policy} | Pool size: {args.pool_size}")
     print(f"[Simulation] Renderer: {'ON' if use_renderer else 'HEADLESS'}")
 
     for step_i in range(config.max_steps):
@@ -79,6 +87,7 @@ def main() -> None:
             print(f"[Simulation] Extinction at step {step_i}!")
             break
 
+        prev_obs = obs
         actions = pool.select_actions(alive, obs)
 
         # Step the world
@@ -86,6 +95,12 @@ def main() -> None:
         obs = result["observations"]
         rewards = result["rewards"]
         info = result["info"]
+
+        # Store transitions and learn
+        pool.store_transitions(
+            alive, prev_obs, actions, rewards, obs, result["done"]
+        )
+        pool.learn_all()
 
         # Update policy fitness
         pool.update_fitness(rewards, world.agents)
